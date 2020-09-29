@@ -1,6 +1,5 @@
 import websocket
 import json
-import requests
 import ssl
 import sys
 import os
