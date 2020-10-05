@@ -1,5 +1,5 @@
 # Live-Cricket-Scores
-Command line interface program for fastest live cricket scores with simple Python program.
+Command Line Interface program for fastest live cricket scores with simple Python program.
 
 ## WHEN CAN I USE
 This code will works all the time during the live matchs.No more use of cricbuzz or live score app
