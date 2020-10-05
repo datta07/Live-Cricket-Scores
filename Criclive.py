@@ -3,21 +3,30 @@ import json
 import ssl
 import sys
 import os
-os.system('cls')
-
 
 class CricLive:
 	def __init__(self,url):
-		self.url=url
-		self.ws = websocket.create_connection(self.url,sslopt={"cert_reqs": ssl.CERT_NONE})
-		self.data={}
-		self.match=None
-		self.indicates={"B":"Ball Started","BS":"Bowler Stopped","WK":"Wicket","OC":"Over Completed","WD":"Wide","FH":"Free Hit","C":"Cancel"}
-		self.params={"p1":"Player1","p2":"Player2","b1s":"player1Score","b2s":"player2Score","bw":"bowler","lw":"lastWicket",
-					 "i1":"innings1Score","i2":"innings2Score","i":"inningsNow","pb":"playerBoard","cs":"DisplayCard",
-					 "os":"position"}
-		self.initialLoad() # Loading the preLoaders
-		self.initialSetup() # Loading for initial setup
+		try:
+			self.clearScreen()
+			self.url=url
+			self.ws = websocket.create_connection(self.url,sslopt={"cert_reqs": ssl.CERT_NONE})
+			self.data={}
+			self.match=None
+			self.indicates={"B":"Ball Started","BS":"Bowler Stopped","WK":"Wicket","OC":"Over Completed","WD":"Wide","FH":"Free Hit","C":"Cancel"}
+			self.params={"p1":"Player1","p2":"Player2","b1s":"player1Score","b2s":"player2Score","bw":"bowler","lw":"lastWicket",
+						 "i1":"innings1Score","i2":"innings2Score","i":"inningsNow","pb":"playerBoard","cs":"DisplayCard",
+						 "os":"position"}
+			self.initialLoad() # Loading the preLoaders
+			self.initialSetup() # Loading for initial setup
+		except KeyboardInterrupt:
+			print("Thank you,see you soon")
+
+	def clearScreen(self):
+		# For clearing screen
+		if (sys.platform=='win32'):
+			os.system('cls')
+		else:
+			os.system('clear')
 
 	def initialLoad(self):
 		self.ws.recv()
@@ -30,8 +39,8 @@ class CricLive:
 		# Selecting the live match
 		for i in data:
 			if (data[i]['con']['mstus']=='L'):
-				self.match=i
 				if (input('*** '+data[i]["t1"]["f"]+" VS "+data[i]["t2"]["f"]+"   Press Y for this match or N for other match:    ").lower()=='y'):
+					self.match=i
 					break
 
 		if (self.match!=None):
@@ -41,7 +50,7 @@ class CricLive:
 			self.data["team1"]=data[self.match]["t1"]["f"]
 			self.data["team2"]=data[self.match]["t2"]["f"]
 		else:
-			print("No current live match")
+			print("NO MORE ONGOING LIVE MATCHS..., COME BACK LATER")
 			exit()
 
 		self.parseData(data[self.match],self.match)
@@ -67,7 +76,7 @@ class CricLive:
 			self.update_process()
 
 	def printScren(self):
-		os.system('cls')
+		self.clearScreen()
 		data=self.data
 		player1Score=data['player1Score'].split(',')
 
