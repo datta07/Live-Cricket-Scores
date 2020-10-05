@@ -12,6 +12,7 @@ class CricLive:
 			self.ws = websocket.create_connection(self.url,sslopt={"cert_reqs": ssl.CERT_NONE})
 			self.data={}
 			self.match=None
+			self.lineWidth=70
 			self.indicates={"B":"Ball Started","BS":"Bowler Stopped","WK":"Wicket","OC":"Over Completed","WD":"Wide","FH":"Free Hit","C":"Cancel"}
 			self.params={"p1":"Player1","p2":"Player2","b1s":"player1Score","b2s":"player2Score","bw":"bowler","lw":"lastWicket",
 						 "i1":"innings1Score","i2":"innings2Score","i":"inningsNow","pb":"playerBoard","cs":"DisplayCard",
@@ -62,6 +63,7 @@ class CricLive:
 		for i in self.params:
 			if (i in data):
 				self.data[self.params[i]]=data[i]
+		self.printScren()
 
 	def update_process(self):
 		data=json.loads(self.ws.recv())
@@ -69,11 +71,21 @@ class CricLive:
 			self.parseData(data["d"]["b"]["d"],data["d"]["b"]["p"])
 		except Exception:
 			print("failed at",data)
-		self.printScren()
 
 	def continous_update(self):
 		while True:
 			self.update_process()
+
+	def spacingEdge(self,keywords):
+		if (len(keywords)==1):
+			lenght=(self.lineWidth-len(keywords[0]))//2
+			return ' '*lenght+keywords[0]+'\n'
+		elif (len(keywords)==2):
+			lenght=(self.lineWidth-len(keywords[0])-len(keywords[1]))
+			return keywords[0]+' '*lenght+keywords[1]+'\n'
+
+	def freeLine(self):
+		return '-'*self.lineWidth+'\n'
 
 	def printScren(self):
 		self.clearScreen()
@@ -100,7 +112,8 @@ class CricLive:
 			player2Score=player2Score[0]+'('+player2Score[1]+')'+'  [4-'+player2Score[2]+',6-'+player2Score[3]+']'
 		else:
 			player2Score=''
-		matter='                    '+data['matchType']+'\n'+'                           '+data['team1']+'  vs  '+data['team2']+'\n'+'-'*60+'\n'+'                        '+data['DisplayCard']['msg']+'\n'+'-'*60+'\n'+'    innings1                                innings2\n'+'    '+data['innings1Score']['sc']+'-'+data['innings1Score']['wk']+'                                       '+data['innings2Score']['sc']+'-'+data['innings2Score']['wk']+'\n'+'    '+data['innings1Score']['ov']+'                                         '+data['innings2Score']['ov']+'\n'+'-'*60+'\n'+'     '+data['Player1']+'  : '+player1Score+'\n'+'     '+data['Player2']+'  : '+player2Score+'\n'+'     Bowler  : '+data['bowler']+'\n'+'-'*60+'\n'+'     Latest Wicket:   '+data['lastWicket']+'\n'+'     Last 24 balls:   '+data['playerBoard']+'\n'+'-'*60
+
+		matter=self.spacingEdge([data['matchType']])+self.spacingEdge([data['team1']+'  vs  '+data['team2']])+self.freeLine()+self.spacingEdge([data['DisplayCard']['msg']])+self.freeLine()+self.spacingEdge(['     '+data['team1']+'(i1)',data['team2']+'(i2)'+'     '])+self.spacingEdge(['       '+data['innings1Score']['sc']+'-'+data['innings1Score']['wk'],data['innings2Score']['sc']+'-'+data['innings2Score']['wk']+'        '])+self.spacingEdge(['       '+data['innings1Score']['ov'],data['innings2Score']['ov']+'        '])+self.freeLine()+'     '+data['Player1']+'  : '+player1Score+'\n'+'     '+data['Player2']+'  : '+player2Score+'\n'+'     Bowler  : '+data['bowler']+'\n'+self.freeLine()+'     Latest Wicket:   '+data['lastWicket']+'\n'+'     Last 24 balls:   '+data['playerBoard']+'\n'+self.freeLine()
 		print(matter)
 
 liveProcess=CricLive('wss://criclive-72dee-43d33.firebaseio.com/.ws?ns=criclive-72dee-43d33&v=5')
