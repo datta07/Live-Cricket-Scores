@@ -6,7 +6,7 @@ This code will works all the time during the live matchs.No more use of cricbuzz
 
 ## How to use
     open command line or terminal
-    ~ pip install -r requirements.text
+    ~ pip install -r requirements.txt
     ~ python Criclive.py
     Now enjoy the live scores......:)
 
