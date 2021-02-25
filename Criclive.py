@@ -39,10 +39,14 @@ class CricLive:
 		data=(json.loads(self.ws.recv()))["d"]["b"]["d"]
 		# Selecting the live match
 		for i in data:
-			if (data[i]['con']['mstus']=='L'):
-				if (input('*** '+data[i]["t1"]["f"]+" VS "+data[i]["t2"]["f"]+"   Press Y for this match or N for other match:    ").lower()=='y'):
-					self.match=i
-					break
+			try:
+				if (data[i]['con']['mstus']=='L'):
+					if (input('*** '+data[i]["t1"]["f"]+" VS "+data[i]["t2"]["f"]+"   Press Y for this match or N for other match:    ").lower()=='y'):
+						self.match=i
+						break
+			except Exception:
+				print("failed for",end=' ')
+				print(data[i],"issue @https://github.com/datta07/Live-Cricket-Scores/")
 
 		if (self.match!=None):
 			self.data["stadium"]=data[self.match]["con"]["g"]
